@@ -11,4 +11,5 @@ router.post('/addPackageDetails', authenticateToken, adminRoute.addPackageDetail
 router.post('/updatePackageDetails', authenticateToken, adminRoute.updatePackageDetails);
 router.post('/deletePackageDetails', authenticateToken, adminRoute.deletePackageDetails);
 
+
 module.exports = router;

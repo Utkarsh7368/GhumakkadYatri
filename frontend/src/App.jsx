@@ -13,6 +13,9 @@ const Contact = React.lazy(() => import('./pages/Contact'));
 const Login = React.lazy(() => import('./pages/Login'));
 const Register = React.lazy(() => import('./pages/Register'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
+const UserBookingManagement = React.lazy(() => import('./pages/UserBookingManagement'));
+const AdminBookingManagement = React.lazy(() => import('./pages/AdminBookingManagement'));
+const BookingPage = React.lazy(() => import('./pages/BookingPage'));
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -54,23 +57,35 @@ function App() {
               } 
             />
             
-            {/* Protected routes - these would require authentication */}
-            {/* <Route 
-              path="/bookings" 
+            {/* Admin booking management - protected */}
+            <Route 
+              path="/admin/bookings" 
               element={
                 <ProtectedRoute>
-                  <MyBookings />
+                  <AdminBookingManagement />
                 </ProtectedRoute>
               } 
             />
+            
+            {/* User booking management - protected */}
             <Route 
-              path="/book/:id" 
+              path="/my-bookings" 
               element={
                 <ProtectedRoute>
-                  <Booking />
+                  <UserBookingManagement />
                 </ProtectedRoute>
               } 
-            /> */}
+            />
+            
+            {/* Booking routes for users */}
+            <Route 
+              path="/book/:packageId" 
+              element={
+                <ProtectedRoute>
+                  <BookingPage />
+                </ProtectedRoute>
+              } 
+            />
             
             {/* Catch all route - 404 */}
             <Route path="*" element={<NotFound />} />

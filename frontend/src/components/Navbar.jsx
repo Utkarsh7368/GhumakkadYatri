@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, Sun, Moon, User, LogOut } from 'lucide-react';
+import { Menu, X, Sun, Moon, User, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
 
@@ -15,9 +16,21 @@ const Navbar = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
+    
+    const handleClickOutside = (event) => {
+      if (showAdminDropdown && !event.target.closest('.admin-dropdown')) {
+        setShowAdminDropdown(false);
+      }
+    };
+    
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    document.addEventListener('click', handleClickOutside);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showAdminDropdown]);
 
   useEffect(() => {
     if (darkMode) {
@@ -30,7 +43,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Packages', path: '/packages' },
-    { name: 'My Bookings', path: '/bookings' },
+    { name: 'My Bookings', path: '/my-bookings', authRequired: true },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -64,7 +77,9 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
+            {navItems
+              .filter(item => !item.authRequired || user)
+              .map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -97,23 +112,48 @@ const Navbar = () => {
 
             {/* User menu */}
             {user ? (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-700 dark:text-gray-300 hidden sm:block">
                   Hi, {user.name}
                 </span>
+                
                 {user.role === 'admin' && (
-                  <Link
-                    to="/admin"
-                    className="btn-primary text-sm"
-                  >
-                    Admin Panel
-                  </Link>
+                  <div className="relative admin-dropdown">
+                    <button
+                      onClick={() => setShowAdminDropdown(!showAdminDropdown)}
+                      className="flex items-center space-x-1 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
+                    >
+                      <span>Admin</span>
+                      <ChevronDown size={14} className={`transition-transform ${showAdminDropdown ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {showAdminDropdown && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 py-1 z-50">
+                        <Link
+                          to="/admin"
+                          onClick={() => setShowAdminDropdown(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          Dashboard
+                        </Link>
+                        <Link
+                          to="/admin/bookings"
+                          onClick={() => setShowAdminDropdown(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          Manage Bookings
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 )}
+                
                 <button
                   onClick={handleLogout}
                   className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                  title="Logout"
                 >
-                  <LogOut size={20} />
+                  <LogOut size={18} />
                 </button>
               </div>
             ) : (
@@ -150,7 +190,9 @@ const Navbar = () => {
         className="md:hidden bg-white dark:bg-gray-900 border-t dark:border-gray-800 overflow-hidden"
       >
         <div className="px-4 py-2 space-y-1">
-          {navItems.map((item) => (
+          {navItems
+            .filter(item => !item.authRequired || user)
+            .map((item) => (
             <Link
               key={item.path}
               to={item.path}
@@ -180,13 +222,22 @@ const Navbar = () => {
                   Signed in as {user.name}
                 </div>
                 {user.role === 'admin' && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setIsOpen(false)}
-                    className="block px-3 py-2 text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
-                  >
-                    Admin Panel
-                  </Link>
+                  <>
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+                    >
+                      Admin Panel
+                    </Link>
+                    <Link
+                      to="/admin/bookings"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+                    >
+                      Manage Bookings
+                    </Link>
+                  </>
                 )}
                 <button
                   onClick={handleLogout}

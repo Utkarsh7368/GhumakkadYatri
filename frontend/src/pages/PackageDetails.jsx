@@ -29,7 +29,6 @@ const PackageDetails = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [travelers, setTravelers] = useState(2);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const [isBooking, setIsBooking] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Fetch package basic info
@@ -126,29 +125,15 @@ const PackageDetails = () => {
       return;
     }
 
-    setIsBooking(true);
-    try {
-      const bookingData = {
-        packageId: packageData.data._id,
-        travelDate: selectedDate,
-        numberOfTravelers: travelers,
-        totalAmount: pricing.adult_price * travelers,
-        contactInfo: {
-          email: user.email,
-          name: user.name
-        }
-      };
-
-      await packageService.createBooking(bookingData);
-      alert('Booking request submitted successfully! We will contact you soon.');
-      
-      setSelectedDate('');
-      setTravelers(2);
-    } catch (error) {
-      alert(error.response?.data?.message || 'Failed to submit booking request');
-    } finally {
-      setIsBooking(false);
-    }
+    // Navigate to booking form with package data
+    navigate(`/book/${packageData.data._id}`, {
+      state: {
+        packageData: packageData.data,
+        selectedDate,
+        travelers,
+        totalAmount: pricing.adult_price * travelers
+      }
+    });
   };
 
   const toggleWishlist = () => {
@@ -540,15 +525,15 @@ const PackageDetails = () => {
 
                   <button
                     onClick={handleBooking}
-                    disabled={isBooking || !selectedDate}
+                    disabled={!selectedDate}
                     className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isBooking ? 'Processing...' : 'Book Now'}
+                    Continue to Booking
                   </button>
 
                   <div className="text-center text-sm text-gray-500 dark:text-gray-400">
                     <Shield size={16} className="inline mr-1" />
-                    Secure booking with instant confirmation
+                    Secure booking form with detailed information
                   </div>
                 </div>
 

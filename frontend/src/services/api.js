@@ -70,3 +70,19 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// Helper function for making API requests
+export const apiRequest = async (method, url, data = null, config = {}) => {
+  try {
+    const response = await api({
+      method,
+      url,
+      data,
+      ...config
+    });
+    return response.data;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};

@@ -5,6 +5,7 @@ const connectDB = require('./config/database');
 const authRouter = require('./routes/authRoute');
 const adminRouter = require('./routes/adminRoute');
 const commonRouter = require('./routes/commonRoute');
+const bookingRouter = require('./routes/bookingRoute');
 dotenv.config();
 
 const app = express();
@@ -17,8 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/common', commonRouter);
-
-
+app.use('/api/booking', bookingRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
