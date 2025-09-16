@@ -5,5 +5,5 @@ const { authenticateToken } = require('../middleware/validateToken');
 
 router.post('/login',authRoute.login);
 router.post('/register',authRoute.register);
-router.post('/logout',authRoute.logout);
+router.post('/logout',authenticateToken,authRoute.logout);
 module.exports = router;

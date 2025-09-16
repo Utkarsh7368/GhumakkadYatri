@@ -14,7 +14,7 @@ exports.login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'User not found, Please Register' });
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
         }
         const existLoginRecord= await UserLoginHistory.findOne({userId:user._id, status:1});
         if(existLoginRecord){
-            return res.status(200).json({token:existLoginRecord.token, message: 'User already logged in' });
+            return res.status(200).json({id:existLoginRecord._id, token:existLoginRecord.token,name:existLoginRecord.name,email:existLoginRecord.email,role:existLoginRecord.role, message: 'User already logged in' });
         }
         const token = await generateToken(user);
         const loginRecord = new UserLoginHistory({ userId: user._id, token, loginTime: Date.now(), status: 1 });
@@ -44,7 +44,7 @@ exports.register = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ name, email, password: hashedPassword, role: 'user' });
+        const newUser = new User({ name, email, password: hashedPassword, role: role || 'user' });
         await newUser.save();
 
         const token = await generateToken(newUser);
