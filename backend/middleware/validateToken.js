@@ -31,9 +31,18 @@ async function authenticateToken(req, res, next) {
     const userId = decoded.id;
 
     if (userId) {
+        // Check if token exists in login history and is active
         const loggedInUser = await UserLoginHistory.findOne({ token, status: 1 });
         if (!loggedInUser) {
-            return res.status(401).json({ message: 'Invalid Token' });
+            return res.status(401).json({ message: 'Session Invalid - Please Login Again' });
+        }
+
+        // Check if this token matches the user's current session token (Single Session)
+        const user = await User.findById(userId);
+        if (!user || user.currentSessionToken !== token) {
+            // Mark this token as inactive since it's not the current session
+            await UserLoginHistory.updateOne({ token }, { status: 0 });
+            return res.status(401).json({ message: 'Session Expired - Logged in from another device' });
         }
     }
 

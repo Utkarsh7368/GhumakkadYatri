@@ -20,14 +20,39 @@ exports.login = async (req, res) => {
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
-        const existLoginRecord= await UserLoginHistory.findOne({userId:user._id, status:1});
-        if(existLoginRecord){
-            return res.status(200).json({id:existLoginRecord._id, token:existLoginRecord.token,name:existLoginRecord.name,email:existLoginRecord.email,role:existLoginRecord.role, message: 'User already logged in' });
-        }
+
+        // Logout all previous sessions for this user (Single Session Login)
+        await UserLoginHistory.updateMany(
+            { userId: user._id, status: 1 }, 
+            { status: 0 }
+        );
+
+        // Generate new token
         const token = await generateToken(user);
-        const loginRecord = new UserLoginHistory({ userId: user._id, token, loginTime: Date.now(), status: 1 });
+        
+        // Update user's current session token
+        user.currentSessionToken = token;
+        await user.save();
+
+        // Create new login record
+        const loginRecord = new UserLoginHistory({ 
+            userId: user._id, 
+            token, 
+            loginTime: Date.now(), 
+            status: 1 
+        });
         await loginRecord.save();
-        res.status(200).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role }, message: 'Login successful' });
+
+        res.status(200).json({ 
+            token, 
+            user: { 
+                id: user._id, 
+                name: user.name, 
+                email: user.email, 
+                role: user.role 
+            }, 
+            message: 'Login successful' 
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
@@ -60,13 +85,17 @@ exports.logout = async (req, res) => {
     try {
         const userId = await helper.getUserIdFromToken(req);
         if (userId) {
+            // Update login history
             const loggedInUser = await UserLoginHistory.findOne({ userId: userId, status: 1 });
             if (!loggedInUser) {
                 return res.status(401).json({ message: 'Already logged out' });
-            }
-            else{
+            } else {
                 loggedInUser.status = 0;
                 await loggedInUser.save();
+
+                // Clear current session token from user
+                await User.findByIdAndUpdate(userId, { currentSessionToken: null });
+
                 return res.status(200).json({ message: 'Logout successful' });
             }
         }

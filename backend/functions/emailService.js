@@ -23,7 +23,7 @@ transporter.verify((error, success) => {
 
 // Send password reset email
 const sendPasswordResetEmail = async (to, resetToken, userName) => {
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
     
     const mailOptions = {
         from: process.env.EMAIL_FROM,
