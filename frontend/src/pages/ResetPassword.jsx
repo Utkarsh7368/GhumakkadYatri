@@ -86,7 +86,8 @@ const ResetPassword = () => {
 
     try {
       const response = await api.post(`/api/auth/resetPassword/${token}`, {
-        password: formData.password
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
       });
       
       setIsSuccess(true);
