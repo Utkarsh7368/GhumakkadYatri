@@ -12,6 +12,8 @@ const About = React.lazy(() => import('./pages/About'));
 const Contact = React.lazy(() => import('./pages/Contact'));
 const Login = React.lazy(() => import('./pages/Login'));
 const Register = React.lazy(() => import('./pages/Register'));
+const ForgotPassword = React.lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./pages/ResetPassword'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const UserBookingManagement = React.lazy(() => import('./pages/UserBookingManagement'));
 const AdminBookingManagement = React.lazy(() => import('./pages/AdminBookingManagement'));
@@ -46,6 +48,8 @@ function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             
             {/* Admin route - protected */}
             <Route 

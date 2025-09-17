@@ -16,6 +16,21 @@ export const authService = {
     const response = await api.post('/api/auth/logout');
     return response.data;
   },
+
+  forgotPassword: async (email) => {
+    const response = await api.post('/api/auth/forgotPassword', { email });
+    return response.data;
+  },
+
+  verifyResetToken: async (token) => {
+    const response = await api.post('/api/auth/verifyResetToken', { token });
+    return response.data;
+  },
+
+  resetPassword: async (token, password) => {
+    const response = await api.post('/api/auth/resetPassword', { token, password });
+    return response.data;
+  },
 };
 
 // Package endpoints
@@ -93,7 +108,7 @@ export const bookingService = {
 // Contact form
 export const contactService = {
   sendMessage: async (messageData) => {
-    const response = await api.post('/api/contact', messageData);
+    const response = await api.post('/api/common/contact', messageData);
     return response.data;
   },
 };
