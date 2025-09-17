@@ -23,12 +23,12 @@ export const authService = {
   },
 
   verifyResetToken: async (token) => {
-    const response = await api.post('/api/auth/verifyResetToken', { token });
+    const response = await api.get(`/api/auth/verifyResetToken/${token}`);
     return response.data;
   },
 
   resetPassword: async (token, password) => {
-    const response = await api.post('/api/auth/resetPassword', { token, password });
+    const response = await api.post(`/api/auth/resetPassword/${token}`, { password });
     return response.data;
   },
 };

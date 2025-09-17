@@ -27,7 +27,7 @@ const ResetPassword = () => {
 
   const verifyToken = async () => {
     try {
-      await api.post('/api/auth/verifyResetToken', { token });
+      await api.get(`/api/auth/verifyResetToken/${token}`);
       setTokenValid(true);
       setMessage('');
     } catch (error) {
@@ -85,8 +85,7 @@ const ResetPassword = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/api/auth/resetPassword', {
-        token,
+      const response = await api.post(`/api/auth/resetPassword/${token}`, {
         password: formData.password
       });
       
