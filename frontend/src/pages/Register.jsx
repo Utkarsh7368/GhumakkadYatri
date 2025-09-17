@@ -153,7 +153,7 @@ const Register = () => {
             </div>
 
             {/* Role Selection */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Account Type
               </label>
@@ -165,7 +165,7 @@ const Register = () => {
                 <option value="user">Traveler</option>
                 <option value="admin">Travel Agent (Admin)</option>
               </select>
-            </div>
+            </div> */}
 
             {/* Password */}
             <div>
