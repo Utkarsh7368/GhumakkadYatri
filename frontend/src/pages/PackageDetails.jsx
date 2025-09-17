@@ -542,11 +542,11 @@ const PackageDetails = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
                       <Phone size={14} />
-                      <span>+91 9876543210</span>
+                      <span>+91 6261338159</span>
                     </div>
                     <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
                       <Mail size={14} />
-                      <span>support@ghumakkadyatri.com</span>
+                      <span>ghumakkadyatriii@gmail.com</span>
                     </div>
                   </div>
                 </div>

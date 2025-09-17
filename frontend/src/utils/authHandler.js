@@ -25,25 +25,35 @@ export const handleTokenExpiration = () => {
     return;
   }
   
+  // Check if we should handle this at all
+  const currentPath = window.location.pathname;
+  const isOnAuthPage = ['/login', '/register'].includes(currentPath);
+  const token = localStorage.getItem('token');
+  
+  if (isOnAuthPage && !token) {
+    console.log('🔕 On auth page with no token, skipping token expiration handling');
+    return;
+  }
+  
   isHandlingExpiration = true;
   console.log('🔥 handleTokenExpiration called, authHandler exists:', !!authHandler);
   
   if (authHandler && authHandler.handleTokenExpiration) {
-    console.log('✅ Calling authHandler.handleTokenExpiration (should show toast)');
+    console.log('✅ Calling authHandler.handleTokenExpiration');
     authHandler.handleTokenExpiration();
   } else {
-    console.log('⚠️ Using fallback token expiration handling (no toast)');
+    console.log('⚠️ Using fallback token expiration handling');
     
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     
     // Use React Router navigation if available, otherwise fallback to window.location
-    if (navigate) {
+    if (navigate && !isOnAuthPage) {
       console.log('🧭 Using navigate to redirect to login');
       setTimeout(() => {
         navigate('/login', { replace: true });
       }, 500);
-    } else {
+    } else if (!isOnAuthPage) {
       console.log('🔄 Using window.location fallback');
       setTimeout(() => {
         window.location.href = '/login';
@@ -54,5 +64,5 @@ export const handleTokenExpiration = () => {
   // Reset the flag after a delay to allow future calls if needed
   setTimeout(() => {
     isHandlingExpiration = false;
-  }, 2000);
+  }, 3000); // Increased to 3 seconds to prevent rapid calls
 };

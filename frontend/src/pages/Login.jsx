@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -11,10 +11,27 @@ import { authService } from '../services/index';
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   
   const { register, handleSubmit, formState: { errors } } = useForm();
+
+  // Clear any existing invalid tokens when login page loads
+  useEffect(() => {
+    // If user is already logged in and valid, redirect to home
+    if (user) {
+      navigate('/', { replace: true });
+      return;
+    }
+    
+    // Clear any invalid tokens silently
+    const token = localStorage.getItem('token');
+    if (token) {
+      console.log('🧹 Clearing existing token on login page');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  }, [user, navigate]);
 
   const onSubmit = async (data) => {
     console.log('onSubmit called with data:', data);

@@ -54,11 +54,22 @@ api.interceptors.response.use(
     // Check for token expiration
     if (error.response?.status === 401) {
       const errorMessage = error.response?.data?.message;
+      const token = localStorage.getItem('token');
+      const currentPath = window.location.pathname;
+      const isOnAuthPage = ['/login', '/register'].includes(currentPath);
+      const isPublicEndpoint = error.config?.url?.includes('/api/common/');
       
-      if (errorMessage === 'Token Expired' || 
+      // Only handle token expiration if:
+      // 1. There's actually a token (user was logged in)
+      // 2. We're not on auth pages already
+      // 3. The error indicates token issues
+      // 4. It's not a public endpoint
+      if (token && !isOnAuthPage && !isPublicEndpoint && (
+          errorMessage === 'Token Expired' || 
           errorMessage === 'Access Denied, Token Missing' || 
           errorMessage === 'Invalid Token' ||
-          errorMessage === 'Authorization Header Missing') {
+          errorMessage === 'Authorization Header Missing'
+        )) {
         console.log('Token expired or invalid, handling expiration');
         handleTokenExpiration();
         return Promise.reject(error);

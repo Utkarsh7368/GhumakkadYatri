@@ -14,17 +14,17 @@ const Contact = () => {
     {
       icon: MapPin,
       title: 'Office Address',
-      details: ['123 Travel Street', 'Connaught Place', 'New Delhi - 110001']
+      details: ['Near Akruti Computer', 'Gouri Ganj', 'Dibiyapur - 206244']
     },
     {
       icon: Phone,
       title: 'Phone Numbers',
-      details: ['+91 9876543210', '+91 9876543211']
+      details: ['+91 6261338159', '+91 9027094703']
     },
     {
       icon: Mail,
       title: 'Email Addresses',
-      details: ['info@ghumakkadyatri.com', 'support@ghumakkadyatri.com']
+      details: ['ghumakkadyatriii@gmail.com', 'dev.utkarshg@gmail.com']
     },
     {
       icon: Clock,
@@ -277,8 +277,8 @@ const Contact = () => {
                     <MapPin size={48} className="mx-auto mb-4" />
                     <p className="text-lg font-medium">Interactive Map</p>
                     <p className="text-sm">
-                      123 Travel Street, Connaught Place<br />
-                      New Delhi - 110001
+                      Near Akruti Computers, Gouri Ganj<br />
+                      Dibiyapur - 206244
                     </p>
                   </div>
                 </div>

@@ -26,9 +26,9 @@ const Footer = () => {
   ];
 
   const contactInfo = [
-    { icon: Phone, text: '+91 9876543210' },
-    { icon: Mail, text: 'info@ghumakkadyatri.com' },
-    { icon: MapPin, text: 'New Delhi, India' },
+    { icon: Phone, text: '+91 6261338159' },
+    { icon: Mail, text: 'ghumakkadyatriii@gmail.com' },
+    { icon: MapPin, text: 'Kanpur, India' },
   ];
 
   return (

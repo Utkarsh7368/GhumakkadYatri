@@ -4,9 +4,9 @@ const adminRoute=require('../controller/adminController');
 const { authenticateToken } = require('../middleware/validateToken');
 
 // Public routes (no authentication required)
-router.post('/getPackages',authenticateToken, adminRoute.getPackages);
-router.post('/getPackageById',authenticateToken, adminRoute.getPackageById);
-router.post('/getPackageDetails',authenticateToken, adminRoute.getPackageDetails);
+router.post('/getPackages', adminRoute.getPackages);
+router.post('/getPackageById', adminRoute.getPackageById);
+router.post('/getPackageDetails', adminRoute.getPackageDetails);
 
 
 

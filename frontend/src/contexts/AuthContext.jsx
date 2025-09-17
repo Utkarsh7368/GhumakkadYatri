@@ -22,12 +22,37 @@ export const AuthProvider = ({ children }) => {
   const handleTokenExpiration = () => {
     console.log('🔑 AuthContext handleTokenExpiration called');
     
+    // Don't show session expired message if:
+    // 1. User is not logged in (no user state)
+    // 2. We're already on login/register pages
+    // 3. No token exists (user was never logged in)
+    const token = localStorage.getItem('token');
+    const currentPath = window.location.pathname;
+    const isOnAuthPage = ['/login', '/register'].includes(currentPath);
+    
+    if (!user || !token || isOnAuthPage) {
+      console.log('🔕 Skipping session expired message - not needed');
+      // Just clear data silently
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
+      
+      // Only navigate if not already on auth page
+      if (!isOnAuthPage) {
+        setTimeout(() => {
+          console.log('🧭 Navigating to login page (silent)');
+          navigate('/login', { replace: true });
+        }, 100);
+      }
+      return;
+    }
+    
     // Clear auth data first
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
     
-    // Show toast ONCE
+    // Show toast for actual logged-in users
     toast.error('Your session has expired. Please login again.', {
       duration: 4000,
       position: 'top-center',

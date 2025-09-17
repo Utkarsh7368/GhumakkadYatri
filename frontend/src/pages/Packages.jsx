@@ -24,13 +24,22 @@ const Packages = () => {
     queryKey: ['packages'],
     queryFn: packageService.getAllPackages,
     onError: (error) => {
-      toast.error('Failed to load packages');
       console.error('Packages fetch error:', error);
+      // Only show error toast if it's not a 401 from public endpoint
+      if (error.response?.status !== 401) {
+        toast.error('Failed to load packages');
+      }
     },
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    retry: (failureCount, error) => {
+      // Don't retry on 401 errors for public endpoints
+      if (error.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 3;
     }
-  );
+  });
 
   const allPackages = packagesResponse?.data || [];
 
@@ -47,16 +56,41 @@ const Packages = () => {
 
   // Show error state
   if (error) {
+    const isAuthError = error.response?.status === 401;
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Failed to load packages</p>
-          <button 
-            onClick={() => refetch()} 
-            className="btn-primary"
-          >
-            Try Again
-          </button>
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="text-6xl mb-4">
+            {isAuthError ? '🔒' : '📦'}
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
+            {isAuthError ? 'Authentication Required' : 'Failed to Load Packages'}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            {isAuthError 
+              ? 'Please log in to view our travel packages.'
+              : 'We encountered an issue loading the packages. Please try again.'
+            }
+          </p>
+          <div className="space-y-3">
+            {isAuthError ? (
+              <div className="space-x-3">
+                <a href="/login" className="btn-primary">
+                  Login
+                </a>
+                <a href="/register" className="btn-secondary">
+                  Sign Up
+                </a>
+              </div>
+            ) : (
+              <button 
+                onClick={() => refetch()} 
+                className="btn-primary"
+              >
+                Try Again
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );

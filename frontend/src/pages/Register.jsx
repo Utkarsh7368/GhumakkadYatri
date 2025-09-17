@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -12,11 +12,28 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { register: registerUser } = useAuth();
+  const { register: registerUser, user } = useAuth();
   const navigate = useNavigate();
   
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const password = watch('password');
+
+  // Clear any existing invalid tokens when register page loads
+  useEffect(() => {
+    // If user is already logged in and valid, redirect to home
+    if (user) {
+      navigate('/', { replace: true });
+      return;
+    }
+    
+    // Clear any invalid tokens silently
+    const token = localStorage.getItem('token');
+    if (token) {
+      console.log('🧹 Clearing existing token on register page');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  }, [user, navigate]);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
