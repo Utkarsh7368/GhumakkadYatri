@@ -267,20 +267,25 @@ const Contact = () => {
               viewport={{ once: true }}
               className="h-full min-h-[500px]"
             >
-              <div className="card h-full p-6">
+              <div className="card h-full p-6 flex flex-col">
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Find Us Here
                 </h3>
-                <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                  {/* Replace with actual map component like Google Maps */}
-                  <div className="text-center text-gray-500 dark:text-gray-400">
-                    <MapPin size={48} className="mx-auto mb-4" />
-                    <p className="text-lg font-medium">Interactive Map</p>
-                    <p className="text-sm">
-                      Near Akruti Computers, Gouri Ganj<br />
-                      Dibiyapur - 206244
-                    </p>
-                  </div>
+                <div className="w-full flex-1 rounded-lg overflow-hidden min-h-[400px]">
+                  <iframe
+                    title="Ghumakkad Yatri Office Location"
+                    src="https://maps.google.com/maps?q=AKRUTI+COMPUTER+SALES+AND+SERVICE,+NTPC+Main+Rd,+Dibiyapur,+Uttar+Pradesh+206242&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, minHeight: '400px' }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                <div className="mt-4 flex items-center text-gray-600 dark:text-gray-400 text-sm">
+                  <MapPin size={16} className="mr-2 flex-shrink-0 text-primary-600 dark:text-primary-400" />
+                  <span>Akruti Computer Sales & Service, NTPC Main Rd, near Numaish Gate, Dibiyapur - 206242</span>
                 </div>
               </div>
             </motion.div>

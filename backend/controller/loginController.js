@@ -73,6 +73,20 @@ exports.register = async (req, res) => {
         await newUser.save();
 
         const token = await generateToken(newUser);
+
+        // Set current session token on user
+        newUser.currentSessionToken = token;
+        await newUser.save();
+
+        // Create login history record
+        const loginRecord = new UserLoginHistory({
+            userId: newUser._id,
+            token,
+            loginTime: Date.now(),
+            status: 1
+        });
+        await loginRecord.save();
+
         res.status(201).json({ token, user: { id: newUser._id, name: newUser.name, email: newUser.email, role: newUser.role }, message: 'Registration successful' });
     } catch (error) {
         console.error(error);

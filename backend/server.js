@@ -66,7 +66,7 @@ app.use('/api/common', commonRouter);
 app.use('/api/booking', bookingRouter);
 app.use('/api/payment', paymentRouter);
 app.use('/api/auth', passwordResetRouter);
-app.use('/api/contact', contactRouter);
+app.use('/api/common', contactRouter);
 
 // 404 handler
 app.use('*', (req, res) => {

@@ -68,7 +68,9 @@ api.interceptors.response.use(
           errorMessage === 'Token Expired' || 
           errorMessage === 'Access Denied, Token Missing' || 
           errorMessage === 'Invalid Token' ||
-          errorMessage === 'Authorization Header Missing'
+          errorMessage === 'Authorization Header Missing' ||
+          errorMessage === 'Session Invalid - Please Login Again' ||
+          errorMessage === 'Session Expired - Logged in from another device'
         )) {
         console.log('Token expired or invalid, handling expiration');
         handleTokenExpiration();
