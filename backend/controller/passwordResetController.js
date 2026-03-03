@@ -37,7 +37,7 @@ exports.forgotPassword = async (req, res) => {
             .digest('hex');
 
         user.resetPasswordToken = hashedToken;
-        user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+        user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 1 hour
         await user.save();
 
         // Send email

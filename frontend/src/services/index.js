@@ -82,28 +82,12 @@ export const packageService = {
   },
 };
 
-// Booking endpoints (these would need to be implemented in backend)
-export const bookingService = {
-  createBooking: async (bookingData) => {
-    const response = await api.post('/api/bookings', bookingData);
-    return response.data;
-  },
+// Booking service - re-export from dedicated module
+// (Do NOT use the placeholder below; import from bookingService.js directly)
+export { default as bookingService } from './bookingService';
 
-  getUserBookings: async () => {
-    const response = await api.get('/api/bookings/user');
-    return response.data;
-  },
-
-  getBookingById: async (id) => {
-    const response = await api.get(`/api/bookings/${id}`);
-    return response.data;
-  },
-
-  cancelBooking: async (id) => {
-    const response = await api.put(`/api/bookings/${id}/cancel`);
-    return response.data;
-  },
-};
+// Payment service
+export { default as paymentService } from './paymentService';
 
 // Contact form
 export const contactService = {

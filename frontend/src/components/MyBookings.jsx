@@ -190,10 +190,20 @@ const MyBookings = () => {
                                                 View Details
                                             </Link>
                                             
-                                            {booking.bookingStatus === 'pending' && (
+                                            {(booking.bookingStatus === 'pending' || booking.bookingStatus === 'confirmed') && new Date(booking.travelDate) >= new Date(new Date().toDateString()) && (
                                                 <button
                                                     onClick={() => openCancelModal(booking)}
                                                     className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg transition-colors"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            )}
+
+                                            {(booking.bookingStatus === 'pending' || booking.bookingStatus === 'confirmed') && new Date(booking.travelDate) < new Date(new Date().toDateString()) && (
+                                                <button
+                                                    disabled
+                                                    className="px-3 py-2 bg-gray-300 text-gray-500 text-sm rounded-lg cursor-not-allowed"
+                                                    title="Cannot cancel — travel date has passed"
                                                 >
                                                     Cancel
                                                 </button>
@@ -318,12 +328,35 @@ const MyBookings = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Reason for Cancellation *
                             </label>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {[
+                                    'Change of plans',
+                                    'Found a better deal',
+                                    'Personal/health reasons',
+                                    'I don\'t want to go on this trip',
+                                    'Weather concerns',
+                                    'Financial reasons'
+                                ].map((reason) => (
+                                    <button
+                                        key={reason}
+                                        type="button"
+                                        onClick={() => setCancellationReason(reason)}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                                            cancellationReason === reason
+                                                ? 'bg-red-100 border-red-400 text-red-700'
+                                                : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        {reason}
+                                    </button>
+                                ))}
+                            </div>
                             <textarea
                                 value={cancellationReason}
                                 onChange={(e) => setCancellationReason(e.target.value)}
                                 rows="3"
                                 className="input-field"
-                                placeholder="Please provide a reason for cancellation..."
+                                placeholder="Or type your own reason..."
                                 required
                             />
                         </div>

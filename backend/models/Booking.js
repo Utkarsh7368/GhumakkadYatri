@@ -75,6 +75,15 @@ const bookingSchema = new mongoose.Schema({
             relation: String
         }
     },
+    razorpayOrderId: {
+        type: String
+    },
+    razorpayPaymentId: {
+        type: String
+    },
+    razorpaySignature: {
+        type: String
+    },
     paymentDetails: {
         paymentMethod: {
             type: String,
@@ -82,7 +91,10 @@ const bookingSchema = new mongoose.Schema({
         },
         transactionId: String,
         paymentDate: Date,
-        paymentGateway: String
+        paymentGateway: {
+            type: String,
+            default: 'razorpay'
+        }
     },
     cancellationDetails: {
         cancelledAt: Date,
@@ -91,18 +103,23 @@ const bookingSchema = new mongoose.Schema({
         refundStatus: {
             type: String,
             enum: ['pending', 'processed', 'rejected']
-        }
+        },
+        refundInitiatedAt: Date,
+        estimatedRefundDate: Date,
+        refundProcessedAt: Date,
+        refundNote: String
     },
     specialRequests: String,
 }, {
     timestamps: true // This adds createdAt and updatedAt automatically
 });
 
-// // Index for better query performance
-// bookingSchema.index({ userId: 1, createdAt: -1 });
-// bookingSchema.index({ packageId: 1 });
-// bookingSchema.index({ paymentStatus: 1 });
-// bookingSchema.index({ travelDate: 1 });
+// Index for better query performance
+bookingSchema.index({ userId: 1, createdAt: -1 });
+bookingSchema.index({ packageId: 1 });
+bookingSchema.index({ paymentStatus: 1 });
+bookingSchema.index({ travelDate: 1 });
+bookingSchema.index({ razorpayOrderId: 1 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 

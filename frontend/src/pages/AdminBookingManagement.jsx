@@ -30,8 +30,13 @@ const AdminBookingManagement = () => {
     useEffect(() => {
         // Set active tab based on URL params
         const tab = searchParams.get('tab');
+        const status = searchParams.get('status');
         if (tab && ['stats', 'bookings'].includes(tab)) {
             setActiveTab(tab);
+        }
+        // If status param present, switch to bookings tab
+        if (status) {
+            setActiveTab('bookings');
         }
     }, [searchParams]);
 
@@ -127,7 +132,7 @@ const AdminBookingManagement = () => {
             {/* Tab Content */}
             <div className="py-6">
                 {activeTab === 'stats' && <BookingStats />}
-                {activeTab === 'bookings' && <AdminBookings />}
+                {activeTab === 'bookings' && <AdminBookings initialStatus={searchParams.get('status') || ''} />}
             </div>
 
             {/* Quick Actions Footer */}

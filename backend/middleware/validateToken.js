@@ -1,6 +1,7 @@
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
-const { ObjectId } = require('mongodb');
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 const  {User,UserLoginHistory}  = require('../models/User');
 require('dotenv').config();
 

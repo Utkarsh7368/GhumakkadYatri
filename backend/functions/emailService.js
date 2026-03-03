@@ -73,7 +73,7 @@ const sendPasswordResetEmail = async (to, resetToken, userName) => {
                 
                 <div style="background: #fff; border-left: 4px solid #f39c12; padding: 15px; margin: 20px 0; border-radius: 5px;">
                     <p style="margin: 0; font-size: 14px;">
-                        <strong>⚠️ Important:</strong> This link will expire in 1 hour for security reasons.
+                        <strong>⚠️ Important:</strong> This link will expire in 10 min for security reasons.
                     </p>
                 </div>
                 

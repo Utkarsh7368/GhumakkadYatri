@@ -125,6 +125,24 @@ class BookingService {
         }
     }
 
+    /**
+     * Process refund for a cancelled booking (Admin only)
+     * @param {string} bookingId - Booking ID
+     * @param {string} refundNote - Optional note about the refund
+     * @returns {Promise} API response
+     */
+    async processRefund(bookingId, refundNote = '') {
+        try {
+            const response = await apiRequest('POST', '/api/booking/admin/processRefund', {
+                bookingId,
+                refundNote
+            });
+            return response;
+        } catch (error) {
+            throw new Error(error.response?.data?.message || 'Failed to process refund');
+        }
+    }
+
     // UTILITY METHODS
 
     /**

@@ -108,8 +108,8 @@ const BookingForm = () => {
             const response = await bookingService.createBooking(cleanedFormData);
             
             if (response.status === 'success') {
-                toast.success('Booking created successfully!');
-                navigate(`/booking-confirmation/${response.data._id}`);
+                toast.success('Booking created! Redirecting to payment...');
+                navigate(`/payment/${response.data._id}`);
             }
         } catch (error) {
             toast.error(error.message || 'Failed to create booking');

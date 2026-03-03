@@ -222,6 +222,14 @@ exports.cancelBooking = async (req, res) => {
             });
         }
 
+        // Prevent cancellation after travel date has passed
+        if (new Date(booking.travelDate) < new Date(new Date().toDateString())) {
+            return res.status(400).json({ 
+                status: 'error',
+                message: 'Cannot cancel booking — travel date has already passed' 
+            });
+        }
+
         // Calculate refund amount (implement your refund policy)
         let refundAmount = 0;
         const daysDifference = Math.ceil((new Date(booking.travelDate) - new Date()) / (1000 * 60 * 60 * 24));
@@ -235,15 +243,37 @@ exports.cancelBooking = async (req, res) => {
         }
         // Less than 3 days: no refund
 
+        // Calculate estimated refund date (5-7 business days from now)
+        const now = new Date();
+        const estimatedRefundDate = new Date(now);
+        let businessDaysAdded = 0;
+        while (businessDaysAdded < 7) {
+            estimatedRefundDate.setDate(estimatedRefundDate.getDate() + 1);
+            const day = estimatedRefundDate.getDay();
+            if (day !== 0 && day !== 6) { // Skip Sunday(0) and Saturday(6)
+                businessDaysAdded++;
+            }
+        }
+
         booking.bookingStatus = 'cancelled';
         booking.cancellationDetails = {
-            cancelledAt: new Date(),
+            cancelledAt: now,
             cancellationReason,
             refundAmount,
-            refundStatus: refundAmount > 0 ? 'pending' : 'processed'
+            refundStatus: refundAmount > 0 ? 'pending' : 'processed',
+            refundInitiatedAt: refundAmount > 0 ? now : undefined,
+            estimatedRefundDate: refundAmount > 0 ? estimatedRefundDate : undefined,
+            refundProcessedAt: refundAmount === 0 ? now : undefined,
+            refundNote: refundAmount > 0
+                ? `Refund of ₹${refundAmount.toFixed(2)} initiated. Expected by ${estimatedRefundDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}.`
+                : 'No refund applicable as per cancellation policy'
         };
 
         await booking.save();
+
+        // Calculate hours remaining for the user-facing response
+        const hoursUntilRefund = Math.ceil((estimatedRefundDate - now) / (1000 * 60 * 60));
+        const daysUntilRefund = Math.ceil(hoursUntilRefund / 24);
 
         res.status(200).json({
             status: 'success',
@@ -251,9 +281,12 @@ exports.cancelBooking = async (req, res) => {
             data: {
                 booking,
                 refundAmount,
-                message: refundAmount > 0 ? 
-                    `Refund of ₹${refundAmount} will be processed within 5-7 business days` : 
-                    'No refund applicable as per cancellation policy'
+                estimatedRefundDate: refundAmount > 0 ? estimatedRefundDate : null,
+                daysUntilRefund: refundAmount > 0 ? daysUntilRefund : 0,
+                hoursUntilRefund: refundAmount > 0 ? hoursUntilRefund : 0,
+                message: refundAmount > 0 
+                    ? `Refund of ₹${refundAmount.toFixed(2)} has been initiated. It will be credited to your account within ${daysUntilRefund} days (~${hoursUntilRefund} hours).`
+                    : 'No refund applicable as per cancellation policy'
             }
         });
 
@@ -361,6 +394,65 @@ exports.getBookingStats = async (req, res) => {
         res.status(500).json({ 
             status: 'error',
             message: 'Server error while fetching booking statistics' 
+        });
+    }
+};
+
+// Admin: Process refund for a cancelled booking
+exports.processRefund = async (req, res) => {
+    try {
+        const { bookingId, refundNote } = req.body;
+
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Booking not found'
+            });
+        }
+
+        if (booking.bookingStatus !== 'cancelled') {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Only cancelled bookings can have refunds processed'
+            });
+        }
+
+        if (!booking.cancellationDetails || booking.cancellationDetails.refundAmount <= 0) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'No refund amount applicable for this booking'
+            });
+        }
+
+        if (booking.cancellationDetails.refundStatus === 'processed') {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Refund has already been processed for this booking'
+            });
+        }
+
+        booking.cancellationDetails.refundStatus = 'processed';
+        booking.cancellationDetails.refundProcessedAt = new Date();
+        booking.cancellationDetails.refundNote = refundNote || `Refund of ₹${booking.cancellationDetails.refundAmount.toFixed(2)} has been credited to your account.`;
+
+        await booking.save();
+
+        const populatedBooking = await Booking.findById(booking._id)
+            .populate('packageId', 'title description price locations duration image_url')
+            .populate('userId', 'name email phone');
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Refund processed successfully',
+            data: populatedBooking
+        });
+
+    } catch (error) {
+        console.error('Process Refund Error:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Server error while processing refund'
         });
     }
 };

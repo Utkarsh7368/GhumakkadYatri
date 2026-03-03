@@ -18,6 +18,8 @@ const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
 const UserBookingManagement = React.lazy(() => import('./pages/UserBookingManagement'));
 const AdminBookingManagement = React.lazy(() => import('./pages/AdminBookingManagement'));
 const BookingPage = React.lazy(() => import('./pages/BookingPage'));
+const PaymentPage = React.lazy(() => import('./pages/PaymentPage'));
+const BookingDetails = React.lazy(() => import('./components/BookingDetails'));
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -87,6 +89,36 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BookingPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* Payment route */}
+            <Route 
+              path="/payment/:bookingId" 
+              element={
+                <ProtectedRoute>
+                  <PaymentPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* Booking confirmation redirects to payment page */}
+            <Route 
+              path="/booking-confirmation/:bookingId" 
+              element={
+                <ProtectedRoute>
+                  <PaymentPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            {/* Booking details */}
+            <Route 
+              path="/booking-details/:bookingId" 
+              element={
+                <ProtectedRoute>
+                  <BookingDetails />
                 </ProtectedRoute>
               } 
             />

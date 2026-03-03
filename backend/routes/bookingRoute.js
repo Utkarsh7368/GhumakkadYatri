@@ -13,5 +13,6 @@ router.post('/cancelBooking', authenticateToken, bookingController.cancelBooking
 // Admin routes (require admin role - you'll need to add admin middleware)
 router.post('/admin/allBookings', authenticateToken, bookingController.getAllBookings);
 router.post('/admin/stats', authenticateToken, bookingController.getBookingStats);
+router.post('/admin/processRefund', authenticateToken, bookingController.processRefund);
 
 module.exports = router;

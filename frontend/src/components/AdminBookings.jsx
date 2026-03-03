@@ -4,11 +4,11 @@ import toast from 'react-hot-toast';
 import bookingService from '../services/bookingService';
 import Loader from './Loader';
 
-const AdminBookings = () => {
+const AdminBookings = ({ initialStatus = '' }) => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({
-        status: '',
+        status: initialStatus,
         paymentStatus: '',
         page: 1,
         limit: 10
@@ -22,6 +22,7 @@ const AdminBookings = () => {
     });
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [processingRefund, setProcessingRefund] = useState(false);
 
     useEffect(() => {
         fetchBookings();
@@ -466,14 +467,62 @@ const AdminBookings = () => {
                                             <div><strong>Cancelled On:</strong> {formatDateTime(selectedBooking.cancellationDetails.cancelledAt)}</div>
                                             <div><strong>Reason:</strong> {selectedBooking.cancellationDetails.cancellationReason}</div>
                                             <div><strong>Refund Amount:</strong> {formatCurrency(selectedBooking.cancellationDetails.refundAmount || 0)}</div>
-                                            <div><strong>Refund Status:</strong> {selectedBooking.cancellationDetails.refundStatus}</div>
+                                            <div>
+                                                <strong>Refund Status:</strong>{' '}
+                                                <span className={`capitalize font-medium ${
+                                                    selectedBooking.cancellationDetails.refundStatus === 'processed' ? 'text-green-700' :
+                                                    selectedBooking.cancellationDetails.refundStatus === 'rejected' ? 'text-red-700' :
+                                                    'text-yellow-700'
+                                                }`}>
+                                                    {selectedBooking.cancellationDetails.refundStatus}
+                                                </span>
+                                            </div>
+                                            {selectedBooking.cancellationDetails.refundInitiatedAt && (
+                                                <div><strong>Initiated On:</strong> {formatDateTime(selectedBooking.cancellationDetails.refundInitiatedAt)}</div>
+                                            )}
+                                            {selectedBooking.cancellationDetails.estimatedRefundDate && selectedBooking.cancellationDetails.refundStatus === 'pending' && (
+                                                <div><strong>Estimated Credit:</strong> {new Date(selectedBooking.cancellationDetails.estimatedRefundDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                                            )}
+                                            {selectedBooking.cancellationDetails.refundProcessedAt && (
+                                                <div><strong>Credited On:</strong> {formatDateTime(selectedBooking.cancellationDetails.refundProcessedAt)}</div>
+                                            )}
+                                            {selectedBooking.cancellationDetails.refundNote && (
+                                                <div className="mt-1 italic text-gray-600">{selectedBooking.cancellationDetails.refundNote}</div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             )}
                         </div>
                         
-                        <div className="flex justify-end mt-6">
+                        <div className="flex justify-between items-center mt-6">
+                            <div>
+                                {/* Process Refund Button — only for pending refunds */}
+                                {selectedBooking.cancellationDetails?.refundStatus === 'pending' && selectedBooking.cancellationDetails?.refundAmount > 0 && (
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                setProcessingRefund(true);
+                                                const response = await bookingService.processRefund(selectedBooking._id);
+                                                if (response.status === 'success') {
+                                                    toast.success('Refund processed successfully');
+                                                    setSelectedBooking(response.data);
+                                                    // Refresh bookings list
+                                                    fetchBookings();
+                                                }
+                                            } catch (error) {
+                                                toast.error(error.message || 'Failed to process refund');
+                                            } finally {
+                                                setProcessingRefund(false);
+                                            }
+                                        }}
+                                        disabled={processingRefund}
+                                        className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
+                                    >
+                                        {processingRefund ? 'Processing...' : `✓ Process Refund (${formatCurrency(selectedBooking.cancellationDetails.refundAmount)})`}
+                                    </button>
+                                )}
+                            </div>
                             <button
                                 onClick={() => setShowDetailsModal(false)}
                                 className="btn-secondary"
