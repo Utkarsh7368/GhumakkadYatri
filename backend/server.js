@@ -24,16 +24,19 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://localhost:5173',
   process.env.FRONTEND_URL,
-  // Add your Vercel domain here
-  'https://ghumakkad-yatri.vercel.app' // Update with your actual domain
+  'https://ghumakkad-yatri.vercel.app',
+  'https://ghumakkadyatri.vercel.app',
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
+    // Allow requests with no origin (mobile apps, curl, Postman, etc.)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
+
+    // Allow any Vercel preview deployments for this project
+    const isVercelPreview = /^https:\/\/ghumakkad-yatri(-[a-z0-9]+)?\.vercel\.app$/.test(origin);
+
+    if (isVercelPreview || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
