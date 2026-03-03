@@ -36,6 +36,25 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// User-only route (blocks admin from booking/payment)
+const UserOnlyRoute = ({ children }) => {
+  const { user, isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <FullPageLoader />;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+  
+  return children;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -73,43 +92,43 @@ function App() {
               } 
             />
             
-            {/* User booking management - protected */}
+            {/* User booking management - protected (users only) */}
             <Route 
               path="/my-bookings" 
               element={
-                <ProtectedRoute>
+                <UserOnlyRoute>
                   <UserBookingManagement />
-                </ProtectedRoute>
+                </UserOnlyRoute>
               } 
             />
             
-            {/* Booking routes for users */}
+            {/* Booking routes for users only */}
             <Route 
               path="/book/:packageId" 
               element={
-                <ProtectedRoute>
+                <UserOnlyRoute>
                   <BookingPage />
-                </ProtectedRoute>
+                </UserOnlyRoute>
               } 
             />
 
-            {/* Payment route */}
+            {/* Payment route - users only */}
             <Route 
               path="/payment/:bookingId" 
               element={
-                <ProtectedRoute>
+                <UserOnlyRoute>
                   <PaymentPage />
-                </ProtectedRoute>
+                </UserOnlyRoute>
               } 
             />
 
-            {/* Booking confirmation redirects to payment page */}
+            {/* Booking confirmation redirects to payment page - users only */}
             <Route 
               path="/booking-confirmation/:bookingId" 
               element={
-                <ProtectedRoute>
+                <UserOnlyRoute>
                   <PaymentPage />
-                </ProtectedRoute>
+                </UserOnlyRoute>
               } 
             />
 

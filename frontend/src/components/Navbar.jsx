@@ -43,7 +43,7 @@ const Navbar = () => {
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Packages', path: '/packages' },
-    { name: 'My Bookings', path: '/my-bookings', authRequired: true },
+    { name: 'My Bookings', path: '/my-bookings', authRequired: true, userOnly: true },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -79,6 +79,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             {navItems
               .filter(item => !item.authRequired || user)
+              .filter(item => !item.userOnly || user?.role !== 'admin')
               .map((item) => (
               <Link
                 key={item.path}
@@ -217,6 +218,7 @@ const Navbar = () => {
         <div className="px-4 py-2 space-y-1">
           {navItems
             .filter(item => !item.authRequired || user)
+            .filter(item => !item.userOnly || user?.role !== 'admin')
             .map((item) => (
             <Link
               key={item.path}

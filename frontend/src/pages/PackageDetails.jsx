@@ -523,18 +523,26 @@ const PackageDetails = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={handleBooking}
-                    disabled={!selectedDate}
-                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Continue to Booking
-                  </button>
+                  {user?.role === 'admin' ? (
+                    <div className="w-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 py-3 px-4 rounded-lg text-center text-sm font-medium">
+                      Admins cannot book packages. Use a user account to book.
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={handleBooking}
+                        disabled={!selectedDate}
+                        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Continue to Booking
+                      </button>
 
-                  <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-                    <Shield size={16} className="inline mr-1" />
-                    Secure booking form with detailed information
-                  </div>
+                      <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+                        <Shield size={16} className="inline mr-1" />
+                        Secure booking form with detailed information
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
